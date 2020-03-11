@@ -1,0 +1,15 @@
+/dstack
+
+# QT Creator (used as IDE only)
+*.creator
+*.creator.user
+*.files
+*.includes
+*.config
+
+# QT Creator (used for QT projects)
+# keep the independent .pro file but delete user files
+*.pro.user
+
+# C Object files
+*.o
