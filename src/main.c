@@ -42,7 +42,9 @@ void test(void)
 int main(int argc, char *argv[])
 {
 
+	stack_load();
 	test();
+	stack_save();
 
 	return 0;
 }

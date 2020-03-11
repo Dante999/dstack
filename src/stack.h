@@ -28,4 +28,7 @@ void        stack_add(const char *path);
 const char *stack_get(int index);
 int         stack_size(void);
 
+void stack_load(void);
+void stack_save(void);
+
 #endif // STACK_H

@@ -22,9 +22,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#define FILE_LOCATION "/tmp/dstack"
 #define MAX_PATH_LENGTH 50
 #define MAX_STACK_SIZE 10
-
 
 static int  g_stack_size = 0;
 static char g_stack[MAX_STACK_SIZE][MAX_PATH_LENGTH];
@@ -71,8 +71,27 @@ int stack_size()
 void stack_print()
 {
 	for (int i = 0; i < g_stack_size; i++) {
-		printf("%2d '%s'\n", i, &g_stack[i][0]);
+		printf("%2d '%s'\n", i, stack_get(i));
 	}
 
 	printf("\n");
+}
+
+void stack_load() {}
+
+void stack_save()
+{
+	FILE *fp = fopen(FILE_LOCATION, "w");
+
+	if (fp == NULL) {
+		printf("unable to open %s\n", FILE_LOCATION);
+	}
+	else {
+		for (int i = 0; i < g_stack_size; i++) {
+			fputs(stack_get(i), fp);
+			fputs("\n", fp);
+		}
+
+		fclose(fp);
+	}
 }
