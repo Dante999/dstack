@@ -77,7 +77,32 @@ void stack_print()
 	printf("\n");
 }
 
-void stack_load() {}
+void stack_load()
+{
+	FILE *fp = fopen(FILE_LOCATION, "r");
+
+	if (fp == NULL) {
+		printf("unable to open %s\n", FILE_LOCATION);
+	}
+	else {
+		char buffer[MAX_PATH_LENGTH];
+
+		while (fgets(buffer, MAX_PATH_LENGTH, fp) != NULL) {
+
+			char *c = rindex(buffer, '\n');
+
+			if (c != NULL) {
+				*c = '\0';
+			}
+
+			printf("adding -> '%s' \n", buffer);
+
+			stack_add(buffer);
+		}
+
+		fclose(fp);
+	}
+}
 
 void stack_save()
 {
