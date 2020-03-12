@@ -20,6 +20,19 @@
 #ifndef CMD_H
 #define CMD_H
 
-void cmd_help(void);
+#define SW_HELP "-h"
+#define SW_ADD "-a"
+#define SW_DEL "-d"
+#define SW_GET "-g"
+#define SW_LIST "-l"
+#define SW_CLEAR "--clear"
+
+int cmd_is_switch(const char *s, const char *sw);
+int cmd_get(int argc, char *argv[]);
+int cmd_add(int argc, char *argv[]);
+int cmd_del(int argc, char *argv[]);
+int cmd_help(void);
+int cmd_list(void);
+int cmd_clear(void);
 
 #endif // CMD_H

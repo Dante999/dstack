@@ -22,40 +22,122 @@
 #include <stdio.h>
 #include <string.h>
 
-#define FILE_LOCATION "/tmp/dstack"
-#define MAX_PATH_LENGTH 50
+/*
+ * file where the stack will be persisted
+ */
+#define FILE_LOCATION "/tmp/dstack.cache"
+
+/*
+ * the maximum allowed length of a path
+ */
+#define MAX_PATH_LENGTH 80
+
+/*
+ * the maximum size of the stack
+ */
 #define MAX_STACK_SIZE 10
 
-static int  g_stack_size = 0;
+/*
+ * counter of the current stack size
+ */
+static int g_stack_size = 0;
+
+/*
+ * stack which holds an array of paths
+ */
 static char g_stack[MAX_STACK_SIZE][MAX_PATH_LENGTH];
 
-void stack_add(const char *path)
+/*******************************************************************************
+ * @brief   checks if the given index is in the allowed range
+ *
+ * If the index is lower than zero or greater than the current stack size, the
+ * functin will return -1.
+ *
+ * @param   index   the index of an entr in the stack
+ *
+ * @return  0 if the index is in the allowed range
+ *         -1 if the index is NOT in the allowed range
+ *
+ ******************************************************************************/
+static int check_index(int index)
+{
+	int result = 0;
+
+	if (index < 0) {
+		printf("no negative index allowed!\n");
+		result = -1;
+	}
+	else if (index >= MAX_STACK_SIZE) {
+		printf("index must be small than %d\n", MAX_STACK_SIZE);
+		result = -1;
+	}
+
+	return result;
+}
+
+/*******************************************************************************
+ * @brief   adds the given path to the end of the directory stack
+ *
+ * @param   *path   the path which will be added to the stack
+ *
+ * @return  0 if adding the path succeed
+ *         -1 if the path length was exceeded or the maximum stack size is
+ *            already reached.
+ *
+ ******************************************************************************/
+int stack_add(const char *path)
 {
 
 	if (strlen(path) > MAX_PATH_LENGTH) {
 		printf("maximum path length exceeded: %lu of %d\n",
 		       strlen(path), MAX_PATH_LENGTH);
-		return;
+		return -1;
 	}
 	else if (g_stack_size >= MAX_STACK_SIZE) {
 		printf("maximum size of stack reached: %d\n", g_stack_size);
-		return;
+		return -1;
 	}
 	else {
 		char *dest = &g_stack[g_stack_size][0];
 		strcpy(dest, path);
 		g_stack_size++;
+		return 0;
 	}
 }
 
+/*******************************************************************************
+ * @brief   removes the path on the given index from the stack
+ *
+ * @param   index   the index of the path to remove
+ *
+ * @return  0 if removing the path succeed
+ *         -1 if removing fails
+ *
+ ******************************************************************************/
+int stack_remove(int index)
+{
+
+	if (check_index(index) == 0) {
+		char *dest = &g_stack[index][0];
+		*dest      = '\0';
+		return 0;
+	}
+	else {
+		return -1;
+	}
+}
+
+/*******************************************************************************
+ * @brief   returns a pointer to the path on the given index
+ *
+ * @param   index   the index of the path
+ *
+ * @return  the path on the index or NULL if the index was out of range
+ *
+ ******************************************************************************/
 const char *stack_get(int index)
 {
-	if (index < 0) {
-		printf("no negative index allowed!\n");
-		return NULL;
-	}
-	else if (index >= MAX_STACK_SIZE) {
-		printf("index must be small than %d\n", MAX_STACK_SIZE);
+	if (check_index(index) != 0) {
 		return NULL;
 	}
 	else {
@@ -63,13 +145,32 @@ const char *stack_get(int index)
 	}
 }
 
+/*******************************************************************************
+ * @brief   returns the size of the stack
+ *
+ * @param   none
+ *
+ * @return  the stack size
+ *
+ ******************************************************************************/
 int stack_size()
 {
 	return g_stack_size;
 }
 
+/*******************************************************************************
+ * @brief   prints the content of the stack to the terminal
+ *
+ * @param   none
+ *
+ * @return  none
+ *
+ ******************************************************************************/
 void stack_print()
 {
+	printf("stack size: %d\n", g_stack_size);
+	printf("----------------------------\n");
+
 	for (int i = 0; i < g_stack_size; i++) {
 		printf("%2d '%s'\n", i, stack_get(i));
 	}
@@ -77,6 +178,14 @@ void stack_print()
 	printf("\n");
 }
 
+/*******************************************************************************
+ * @brief   loads the stack from the file storage
+ *
+ * @param   none
+ *
+ * @return  none
+ *
+ ******************************************************************************/
 void stack_load()
 {
 	FILE *fp = fopen(FILE_LOCATION, "r");
@@ -95,8 +204,6 @@ void stack_load()
 				*c = '\0';
 			}
 
-			printf("adding -> '%s' \n", buffer);
-
 			stack_add(buffer);
 		}
 
@@ -104,6 +211,14 @@ void stack_load()
 	}
 }
 
+/*******************************************************************************
+ * @brief   saves the current stack to the file storage
+ *
+ * @param   none
+ *
+ * @return  none
+ *
+ ******************************************************************************/
 void stack_save()
 {
 	FILE *fp = fopen(FILE_LOCATION, "w");
@@ -113,10 +228,36 @@ void stack_save()
 	}
 	else {
 		for (int i = 0; i < g_stack_size; i++) {
-			fputs(stack_get(i), fp);
-			fputs("\n", fp);
-		}
 
-		fclose(fp);
+			if (strlen(stack_get(i)) > 0) {
+				fputs(stack_get(i), fp);
+				fputs("\n", fp);
+			}
+		}
 	}
+
+	fclose(fp);
+}
+
+/*******************************************************************************
+ * @brief   clears the whole stack
+ *
+ * @param   none
+ *
+ * @return  0 if the clear operation succeed
+ *         -1 if anything went wrong
+ *
+ ******************************************************************************/
+int stack_clear()
+{
+	int errors = 0;
+
+	for (int i = 0; i < g_stack_size; i++) {
+		errors += stack_remove(i);
+	}
+
+	if (errors == 0)
+		return 0;
+	else
+		return -1;
 }

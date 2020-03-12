@@ -18,32 +18,50 @@
  *
  ******************************************************************************/
 #include <stdio.h>
+#include <string.h>
 
 #include "cmd.h"
 #include "stack.h"
 
-void test(void)
-{
-	printf("testing...\n");
-
-	printf("---\n");
-	printf("current size: %d\n\n", stack_size());
-
-	stack_add("/tmp/mozilla");
-	stack_add("~/Projekte");
-	stack_add("/usr/local/bin");
-
-	printf("---\n");
-	printf("current size: %d\n\n", stack_size());
-
-	stack_print();
-}
-
+/*******************************************************************************
+ * @brief   entry point of the program
+ *
+ * @param   argc   number of input arguments
+ *          argv   array of given input arguments
+ *
+ * @return  0 if the programm finished without errors
+ *
+ ******************************************************************************/
 int main(int argc, char *argv[])
 {
-
 	stack_load();
-	test();
+
+	if (argc == 1) {
+		cmd_list();
+		return 0;
+	}
+
+	const char *sw = argv[1];
+
+	if (strcmp(sw, SW_HELP) == 0) {
+		cmd_help();
+	}
+	else if (strcmp(sw, SW_ADD) == 0) {
+		cmd_add(argc, argv);
+	}
+	else if (strcmp(sw, SW_DEL) == 0) {
+		cmd_del(argc, argv);
+	}
+	else if (strcmp(sw, SW_GET) == 0) {
+		cmd_get(argc, argv);
+	}
+	else if (strcmp(sw, SW_LIST) == 0) {
+		cmd_list();
+	}
+	else {
+		printf("unknown command: %s\n", sw);
+	}
+
 	stack_save();
 
 	return 0;
