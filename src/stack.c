@@ -19,9 +19,9 @@
  ******************************************************************************/
 #include "stack.h"
 
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
-
 /*
  * file where the stack will be persisted
  */
@@ -73,6 +73,23 @@ static int check_index(int index)
 	}
 
 	return result;
+}
+
+/*******************************************************************************
+ * @brief   cuts the string at the last newline charcter (\n)
+ *
+ * @param   *s   string with a newline character
+ *
+ * @return  none
+ *
+ ******************************************************************************/
+static void remove_newline(char *s)
+{
+	char *c = rindex(s, '\n');
+
+	if (c != NULL) {
+		*c = '\0';
+	}
 }
 
 /*******************************************************************************
@@ -181,6 +198,10 @@ void stack_print()
 /*******************************************************************************
  * @brief   loads the stack from the file storage
  *
+ * if the command is called the first time or the previous stack for saving was
+ * empty, there is no cached file to load. In this case the error is supressed
+ * and not printed to stderr
+ *
  * @param   none
  *
  * @return  none
@@ -190,24 +211,20 @@ void stack_load()
 {
 	FILE *fp = fopen(FILE_LOCATION, "r");
 
-	if (fp == NULL) {
-		printf("unable to open %s\n", FILE_LOCATION);
-	}
-	else {
+	if (fp != NULL) {
 		char buffer[MAX_PATH_LENGTH];
 
 		while (fgets(buffer, MAX_PATH_LENGTH, fp) != NULL) {
-
-			char *c = rindex(buffer, '\n');
-
-			if (c != NULL) {
-				*c = '\0';
-			}
-
+			remove_newline(buffer);
 			stack_add(buffer);
 		}
 
 		fclose(fp);
+	}
+	// supress file not found error (ENOENT)
+	else if (fp == NULL && errno != ENOENT) {
+		fprintf(stderr, "unable to open %s : %s\n", FILE_LOCATION,
+			strerror(errno));
 	}
 }
 
