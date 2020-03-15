@@ -58,6 +58,9 @@ int main(int argc, char *argv[])
 	else if (strcmp(sw, SW_LIST) == 0) {
 		cmd_list();
 	}
+	else if (strcmp(sw, SW_CLEAR) == 0) {
+		cmd_clear();
+	}
 	else {
 		printf("unknown command: %s\n", sw);
 	}
