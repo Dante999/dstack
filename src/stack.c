@@ -20,8 +20,10 @@
 #include "stack.h"
 
 #include <errno.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+
 /*
  * file where the stack will be persisted
  */
@@ -55,24 +57,24 @@ static char g_stack[MAX_STACK_SIZE][MAX_PATH_LENGTH];
  *
  * @param   index   the index of an entr in the stack
  *
- * @return  0 if the index is in the allowed range
- *         -1 if the index is NOT in the allowed range
+ * @return  true if the index is in the allowed range
+ *          false if the index is NOT in the allowed range
  *
  ******************************************************************************/
-static int check_index(int index)
+static bool index_ok(int index)
 {
-	int result = 0;
+	bool retval = true;
 
 	if (index < 0) {
 		printf("no negative index allowed!\n");
-		result = -1;
+		retval = false;
 	}
 	else if (index >= MAX_STACK_SIZE) {
-		printf("index must be small than %d\n", MAX_STACK_SIZE);
-		result = -1;
+		printf("index must be smaller than %d\n", MAX_STACK_SIZE);
+		retval = false;
 	}
 
-	return result;
+	return retval;
 }
 
 /*******************************************************************************
@@ -134,7 +136,7 @@ int stack_add(const char *path)
 int stack_remove(int index)
 {
 
-	if (check_index(index) == 0) {
+	if (index_ok(index)) {
 		char *dest = &g_stack[index][0];
 		*dest      = '\0';
 		return 0;
@@ -154,11 +156,11 @@ int stack_remove(int index)
  ******************************************************************************/
 const char *stack_get(int index)
 {
-	if (check_index(index) != 0) {
-		return NULL;
+	if (index_ok(index)) {
+		return (const char *)&g_stack[index][0];
 	}
 	else {
-		return (const char *)&g_stack[index][0];
+		return NULL;
 	}
 }
 
