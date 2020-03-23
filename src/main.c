@@ -61,6 +61,9 @@ int main(int argc, char *argv[])
 	else if (strcmp(sw, SW_CLEAR) == 0) {
 		cmd_clear();
 	}
+	else if (strcmp(sw, SW_VERSION) == 0) {
+		cmd_version();
+	}
 	else {
 		printf("unknown command: %s\n", sw);
 	}

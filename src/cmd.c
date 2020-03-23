@@ -23,6 +23,7 @@
 #include <string.h>
 
 #include "stack.h"
+#include "version.h"
 
 static int str_to_int(const char *s)
 {
@@ -110,4 +111,10 @@ int cmd_get(int argc, char *argv[])
 			return -1;
 		}
 	}
+}
+
+int cmd_version()
+{
+	printf("dstack %s\n", DSTACK_VERSION);
+	return 0;
 }

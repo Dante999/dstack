@@ -26,6 +26,7 @@
 #define SW_GET "-g"
 #define SW_LIST "-l"
 #define SW_CLEAR "--clear"
+#define SW_VERSION "--version"
 
 int cmd_is_switch(const char *s, const char *sw);
 int cmd_get(int argc, char *argv[]);
@@ -34,5 +35,6 @@ int cmd_del(int argc, char *argv[]);
 int cmd_help(void);
 int cmd_list(void);
 int cmd_clear(void);
+int cmd_version(void);
 
 #endif // CMD_H
